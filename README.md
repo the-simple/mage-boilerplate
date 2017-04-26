@@ -8,9 +8,9 @@ It includes:
 - percona server
 - redis
 - centralized log (REK stack)
- - rsyslog
- - elasticsearch
- - kibana
+  - rsyslog
+  - elasticsearch
+  - kibana
 
 ## Installation and Run
 First you need to clone the project
