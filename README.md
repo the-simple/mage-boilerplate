@@ -92,7 +92,7 @@ Be sure that each service has uncommented `build` and commented `image` options
 ```yaml
 services:
   db:
-    # image: the-simple/centos-percona:57
+    # image: thesimple/centos-percona:57
     build: ./src/centos-percona
 ```
 
@@ -102,7 +102,7 @@ For that you need some modufications. For each service you need to uncomment `im
 ```yaml
 services:
   db:
-    image: the-simple/centos-percona
+    image: thesimple/centos-percona
     # build: ./src/percona
 ```
 
