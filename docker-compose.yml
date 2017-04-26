@@ -1,0 +1,104 @@
+version: '2'
+
+services:
+  db:
+    image: thesimple/centos-percona
+    # build: ./src/centos-percona
+    mem_limit: 2g
+    hostname: db.loc
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./var/mysql/:/var/lib/mysql
+      # - ./var/mysql-init/:/docker-entrypoint-initdb.d/
+    environment:
+      ## Allow use root without password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      ## If container doesn't have /var/lib/mysql folder it will be created
+      ## with defined DB.
+      - MYSQL_DATABASE=magento
+      - MYSQL_USER=magento
+      - MYSQL_PASSWORD=1qaz2wsx
+  php:
+    image: thesimple/centos-php
+    # build: ./src/centos-php
+    mem_limit: 512M
+    privileged: true
+    hostname: php-fpm.loc
+    environment:
+      # system cron schedule. By default every 10 minutes
+      # - MAGE_CRON_EXPR="*/10 * * * *"
+      # custom cron expression
+      # for example run cron.php from magento every hour at 01 minute
+      # - MAGE_CUSTOM_CRON="1 * * * * root /usr/bin/env php /var/www/html/magento/cron.php"
+      - HOSTNAME=php-fpm.loc
+    volumes:
+      # custom installation
+      # - ./var/www/html/magento:/var/www/html/magento
+      - ./src/magento-lts:/var/www/html/magento
+    volumes_from:
+      - rsyslog
+    links:
+      - db
+      - redis
+      - rsyslog
+  nginx:
+    image: thesimple/centos-openresty
+    # build: ./src/centos-openresty
+    hostname: nginx.loc
+    environment:
+        - HOSTNAME=nss.loc
+    mem_limit: 256M
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+      - ./config/nginx/nginx-r2.conf:/usr/local/openresty/nginx/conf/conf.d/01-magento-r2.conf
+      - ./config/nginx/magento-snippets.conf:/usr/local/openresty/nginx/conf/snippets/magento-site
+      - ./config/nginx/nginx.key:/etc/nginx/ssl/nginx.key
+      - ./config/nginx/nginx.crt:/etc/nginx/ssl/nginx.crt
+    volumes_from:
+      - php
+    links:
+      - php
+      - rsyslog
+
+  redis:
+    image: redis:3.2-alpine
+    mem_limit: 512M
+    hostname: redis.loc
+    environment:
+    - HOSTNAME=redis.loc
+    links:
+      - rsyslog
+
+  rsyslog:
+    image: thesimple/centos-rsyslog
+    # build: ./src/centos-rsyslog
+    privileged: true
+    hostname: rsyslog.loc
+    volumes:
+      - ./config/rsyslog/syslog.conf:/etc/rsyslog.d/49-ship-syslog.conf
+    links:
+      - "elasticsearch:elasticsearch"
+
+  elasticsearch:
+    image: thesimple/centos-elasticsearch
+    # build: ./src/centos-elasticsearch
+    mem_limit: 1G
+    user: elasticsearch
+    hostname: elasticsearch.loc
+    volumes:
+      - ./config/elasticsearch/elasticsearch.yml:/etc/elasticsearch/elasticsearch.yml
+
+  kibana:
+    image: thesimple/centos-kibana
+    # build: ./src/centos-kibana
+    hostname: kibana.loc
+    ports:
+      - "5601:5601"
+    links:
+      - "elasticsearch:elasticsearch"
+    volumes:
+      - ./config/kibana/kibana.yml:/etc/kibana/kibana.yml

@@ -1,0 +1,21 @@
+[submodule "src/centos-rsyslog"]
+	path = src/centos-rsyslog
+	url = git@github.com:the-simple/centos-rsyslog.git
+[submodule "src/centos-php"]
+	path = src/centos-php
+	url = git@github.com:the-simple/centos-php.git
+[submodule "src/centos-percona"]
+	path = src/centos-percona
+	url = git@github.com:the-simple/centos-percona.git
+[submodule "src/centos-openresty"]
+	path = src/centos-openresty
+	url = git@github.com:the-simple/centos-openresty.git
+[submodule "src/centos-kibana"]
+	path = src/centos-kibana
+	url = git@github.com:the-simple/centos-kibana.git
+[submodule "src/centos-elasticsearch"]
+	path = src/centos-elasticsearch
+	url = git@github.com:the-simple/centos-elasticsearch.git
+[submodule "src/magento-lts"]
+	path = src/magento-lts
+	url = git@github.com:OpenMage/magento-lts.git
